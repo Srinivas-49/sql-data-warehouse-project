@@ -1,0 +1,29 @@
+insert into silver.crm_cust_info (
+cst_id,
+cst_key,
+cst_firstname,
+cst_lastname,
+cst_marital_status,
+cst_gndr,
+cst_create_date)
+
+
+select cst_id,cst_key,trim(cst_firstname) as cst_firstname,
+trim(cst_lastname) as cst_lastname,
+case 
+when cst_martial_status='M' then 'Married'
+when cst_martial_status='S' then 'Single'
+else 'n/a'
+end 
+cst_martial_status,
+case
+when trim(cst_gender) ='M' then 'Male'
+when trim(cst_gender)='F' then 'Female'
+else 'n/a'
+end cst_gender,
+cst_creation_date 
+from (
+select * from (
+select  *,rank() 
+over(partition by cst_id order by cst_creation_date desc) rt from bronze.crm_cust_info) tt where cst_id is not null) ee where rt=1
+
